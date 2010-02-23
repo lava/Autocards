@@ -129,17 +129,14 @@ class AutoQuiz
 		@game_in_progress = false
 		@end_time = Time.now
 		@rects = []
-		@current_page = 0
+		@current_page = @doc.get_page(0)
 
 		puts "Final score: #{@correct} correct, #{@incorrect} incorrect. (with #{@skipped} skipped)"
 		puts "Time needed: #{(@end_time - @start_time).to_i}s"
 
-		begin
-			@highscore_manager.add_score(@username, @filename, @game_length, @correct, @skipped, (@end_time - @start_time).to_i)
-			puts "Score was saved successfully"
-		rescue
-			puts "Error while saving score."
-		end
+		@highscore_manager.add_score(@username, @filename, @game_length, @correct, @skipped, (@end_time - @start_time).to_i)
+
+		@top_window.queue_draw
 	end
 
 	def check_word(word)

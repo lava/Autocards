@@ -10,15 +10,15 @@ class WordManager
 
 	def initialize(pdfpath)
 		raw_words = WordScanner.new.scan(pdfpath).get_words
-		fresh_db = true	unless File.exist? WordManager::DB_PATH
-		@filename = pdfpath.split("/").last
-		ActiveRecord::Base.establish_connection(
-			:adapter => "sqlite3",
-			:database => WordManager::DB_PATH
-		)
+
+		dbpath = WordManager::DB_PATH
+		fresh_db = true	unless File.exist? dbpath
+
+		establish_db_connection(dbpath)
 
 		SetupBannedWordDatabase.up if fresh_db
 
+		@filename = pdfpath.split("/").last
 		doc = PDFDocument.find(:first, :conditions => {:filename => @filename })
 		if doc.nil?
 			#create new entry for this file if it doesnt exist
@@ -27,10 +27,28 @@ class WordManager
 		end
 		@document_id = doc.id
 
-		p @document_id
 		banned_words = BannedWord.find(:all, :conditions => { :document_id => @document_id }).map {|bw| Word.new(bw.page, bw.text)}
-		p banned_words
 		@words = raw_words - banned_words
+	end
+
+	def establish_db_connection(dbpath)
+		ActiveRecord::Base.establish_connection(
+			:adapter => "sqlite3",
+			:database => dbpath 
+		)
+		#anyone who wants to do do migrations apparently has to set
+		#the connection of ActiveRecord::Base, so we have to set
+		#the connection of our specific classes seperately
+		#stupid rails magic :/
+		BannedWord.establish_connection(
+			:adapter => "sqlite3",
+			:database => dbpath
+		)
+		PDFDocument.establish_connection(
+			:adapter => "sqlite3",
+			:database => dbpath
+		)
+
 	end
 
 	def random_word

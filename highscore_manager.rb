@@ -1,34 +1,48 @@
+require 'rubygems'
 require 'yaml'
-require 'score'
+require 'activerecord'
 
+require 'highscore_manager_ar'
 
-#TODO move to sqlite, maybe even activerecord
+#TODO add some way to actually get the stored highscores
 class HighscoreManager
-	HIGHSCORE_FILE = './hiscore.yaml'
+	HIGHSCORE_FILE = './highscores.db'
 
-	def initialize(filename = HighscoreManager::HIGHSCORE_FILE)
+	def initialize()
 		#create file if it doesnt exist
-		@filename = filename
-		unless File.exist? filename
-			File.open(filename, "w") {|io| YAML.dump({}, io) }
+		path = HighscoreManager::HIGHSCORE_FILE
+		unless File.exist? path
+			fresh_db = true
 		end
 
-		@hiscores = YAML.load_file(filename)
-		unless @hiscores.is_a? Hash
-			raise "Corrupted highscore file."
-		end
+		establish_db_connection(path)
+
+		SetupHighscoreDatabase.up if fresh_db
 	end
 
-	def add_score(username, pdfname, length, correct, skipped, time)
-		raise "Invalid pdf name" unless pdfname.is_a? String
-		name = pdfname.split("/").last
-		score = Score.new(username, name, length, correct, skipped, time)
-		@hiscores[name] ||= []
-		@hiscores[name] << score
+	def establish_db_connection(path)
+		ActiveRecord::Base.establish_connection(
+			:adapter => "sqlite3",
+			:database => path
+		)
 
-		#p @hiscores.inspect
+		Score.establish_connection(
+			:adapter => "sqlite3",
+			:database => path
+		)
+	end
 
-		# if there are destructors in ruby, one has to do this once
-		File.open(@filename, "w") {|io| YAML.dump(@hiscores, io) }
+	def add_score(name, filepath, game_length, correct, skipped, duration)
+		raise "Invalid pdf name" unless filepath.is_a? String
+		filename = filepath.split("/").last
+		score = Score.create do |s|
+			s.name = name 
+			s.filename = filename 
+			s.game_length = game_length
+		       	s.correct = correct
+		       	s.skipped = skipped
+			s.duration = duration
+		end
+		score.save
 	end
 end
