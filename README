@@ -3,3 +3,6 @@ ruby autocards.rb [name of the pdf file]
 
 Note that this program has pretty heavy dependencies: GTK+ bindings, 
 Poppler bindings, the sqlite3 gem and ActiveRecord.
+
+Also note that this was written in about 3 evenings, using 4 unfamiliar
+libraries, so code quality is pretty poor. Its working, though.
