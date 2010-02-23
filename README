@@ -1,0 +1,5 @@
+Usage:
+ruby autocards.rb [name of the pdf file]
+
+Note that this program has pretty heavy dependencies: GTK+ bindings, 
+Poppler bindings, the sqlite3 gem and ActiveRecord.
