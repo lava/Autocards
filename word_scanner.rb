@@ -1,6 +1,8 @@
+# encoding: UTF-8
+
 require 'poppler'
 
-require 'word'
+require './word'
 
 class WordScanner
 	def initialize(options = {})
@@ -13,12 +15,12 @@ class WordScanner
 		@words = []
 		0.upto(doc.n_pages-1).each do |i|
 			page = doc.get_page(i)
-			rect = Poppler::Rectangle.new(0,0,-1,-1) 
+			rect = Poppler::Rectangle.new(0,0, page.size[0], page.size[0]) 
 			#get_text seems to return the whole text on the 
 			#site regardless of what we pass as argument, but
 			#i'm not sure if this is a bug or if i dont understand
 			#the calling conventions
-			text = page.get_text(rect).gsub(/[.:,;„“?!\[\]()\f\n\/0-9%]/, " ")
+			text = page.get_text(rect).gsub(/[.:,;?!\[\]()\f\n\/0-9%]/, " ")
 			@words += text.split(" ").select {|w| w.size > 5 || (w != w.downcase && w.size > 3)}.uniq.map {|w| Word.new(i, w)}
 		end
 		puts "Found #{@words.size} words total."

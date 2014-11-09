@@ -2,8 +2,8 @@ require 'gtk2'
 	
 require 'poppler'
 
-require 'word_manager'
-require 'highscore_manager'
+require './word_manager'
+require './highscore_manager'
 
 class AutoQuiz
 	DEFAULT_GAME_LENGTH = 15

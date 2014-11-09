@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'yaml'
-require 'activerecord'
+require 'active_record'
 
-require 'highscore_manager_ar'
+require './highscore_manager_ar'
 
 #TODO add some way to actually get the stored highscores
 class HighscoreManager

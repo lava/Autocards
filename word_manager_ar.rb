@@ -1,9 +1,9 @@
-require 'activerecord'
+require 'active_record'
 
 #ActiveRecord classes for the WordManager
 
 class PDFDocument < ActiveRecord::Base
-	set_table_name 'documents'
+	self.table_name = 'documents'
 end
 
 class BannedWord < ActiveRecord::Base
@@ -15,7 +15,7 @@ class SetupBannedWordDatabase < ActiveRecord::Migration
 			t.string :filename
 		end
 
-		add_index :documents, :filename, :unique
+		add_index :documents, [:filename], unique:true
 
 		create_table :banned_words do |t|
 			t.references :document

@@ -1,4 +1,4 @@
-require 'activerecord'
+require 'active_record'
 
 #ActiveRecord classes for the highscore manager
 
